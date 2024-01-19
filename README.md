@@ -11,3 +11,8 @@ REPORT_GAS=true npx hardhat test
 npx hardhat node
 npx hardhat run scripts/deploy.ts
 ```
+
+
+Run a forked ethereum mainnet locally:
+
+`npx hardhat node --fork https://mainnet.infura.io/v3/{infura_api_key}`

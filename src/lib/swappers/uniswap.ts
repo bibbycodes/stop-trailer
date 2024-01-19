@@ -1,13 +1,12 @@
-import { ethers, BigNumber } from 'ethers';
+import {ethers, JsonRpcProvider} from 'ethers';
 import {uniV3RouterAbi, erc20Abi} from "../../abis/abis";
-export class UniswapV3Swapper {
-  private provider: ethers.providers.JsonRpcProvider;
-  private signer: ethers.Signer;
-  private router: ethers.Contract;
-  private uniswapRouterAddress: string;
 
-  constructor(provider: ethers.providers.JsonRpcProvider, signer: ethers.Signer, uniswapRouterAddress: string) {
-    this.provider = provider
+export class UniswapV3Swapper {
+  private readonly signer: ethers.Signer;
+  private router: ethers.Contract;
+  private readonly uniswapRouterAddress: string;
+
+  constructor(provider: JsonRpcProvider, signer: ethers.Signer, uniswapRouterAddress: string) {
     this.signer = signer;
     this.uniswapRouterAddress = uniswapRouterAddress;
     this.router = new ethers.Contract(
@@ -17,10 +16,8 @@ export class UniswapV3Swapper {
     );
   }
 
-  async swap(tokenIn: string, tokenOut: string, amountIn: BigNumber, amountOutMin: BigNumber, fee: number, recipient: string, deadline: number): Promise<string> {
-    const tokenContract = new ethers.Contract(tokenIn, erc20Abi, this.signer);
-    await tokenContract.approve(this.uniswapRouterAddress, amountIn);
-
+  // Assuming tokens have already been approved
+  async swap(tokenIn: string, tokenOut: string, amountIn: BigInt, amountOutMin: BigInt, fee: number, recipient: string, deadline: number): Promise<string> {
     const params = {
       tokenIn: tokenIn,
       tokenOut: tokenOut,
@@ -33,9 +30,21 @@ export class UniswapV3Swapper {
     };
 
     const tx = await this.router.exactInputSingle(params);
+
+    if (!tx) {
+      throw "No tx"
+    }
+    
     const receipt = await tx.wait();
-    return receipt.transactionHash;
+    
+    if (!receipt) {
+      throw "No receipt"
+    }
+    
+    return receipt;
+  }
+  
+  getRouterContract = () => {
+    return this.router
   }
 }
-
-
