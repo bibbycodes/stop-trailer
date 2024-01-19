@@ -17,6 +17,10 @@ app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
 
+app.get('/transactions', (req, res) => {
+  const {id} = req.body
+})
+
 app.post('/orders', (req, res) => {
   const { price, assetId, walletAddress} = req.body;
 
